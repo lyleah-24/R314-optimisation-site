@@ -75,11 +75,20 @@
     var list = UIKit.qs('#motscles');
     if (!list) return;
 
-    list.innerHTML = '';
+    /* Un seul rattachement au document. La version d'origine faisait
+       « list.innerHTML += ... » à chaque tour de boucle : le navigateur
+       sérialise alors tout le contenu déjà construit, le ré-analyse et
+       reconstruit tous les nœuds, à chacune des 330 itérations. Coût
+       quadratique pour un résultat identique — un DocumentFragment
+       conserve l'ordre tout aussi bien. */
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < TAGS.length; i++) {
-      // On ajoute chaque entrée au fur et à mesure pour garder l'ordre.
-      list.innerHTML += '<option value="' + TAGS[i] + '"></option>';
+      var opt = document.createElement('option');
+      opt.value = TAGS[i];
+      frag.appendChild(opt);
     }
+    list.innerHTML = '';
+    list.appendChild(frag);
   }
 
   /* Construit le calendrier d'activité : 53 semaines de 7 jours, la teinte de
@@ -154,24 +163,42 @@
     }
   }
 
-  /* Aligne la hauteur des cartes et anime leur arrivée dans le viewport. */
+  /* Aligne la hauteur des cartes et anime leur arrivée dans le viewport.
+
+     Réécrite pour ne plus provoquer de reflow forcé. La version d'origine
+     relisait offsetHeight de toutes les cartes à l'intérieur de la boucle
+     qui écrivait minHeight sur chacune : chaque lecture obligeait le
+     navigateur à recalculer la mise en page que l'écriture précédente
+     venait d'invalider, soit N x N recalculs par appel — et le même
+     schéma sur les 371 cases du calendrier. Ici toutes les lectures ont
+     lieu d'abord, toutes les écritures ensuite : un seul calcul de mise
+     en page par appel. Le rendu obtenu est le même. */
   function revealCards() {
     var cards = UIKit.qsa('.card');
+    var jours = UIKit.qsa('.cal-day');
+    var vh = window.innerHeight;
+    var i;
 
-    for (var i = 0; i < cards.length; i++) {
-      var rect = cards[i].getBoundingClientRect();
-
-      // Hauteur de la plus grande carte, pour garder une grille régulière.
-      var tallest = 0;
-      var all = UIKit.qsa('.card');
-      for (var j = 0; j < all.length; j++) {
-        if (all[j].offsetHeight > tallest) {
-          tallest = all[j].offsetHeight;
-        }
+    /* --- Phase de lecture : aucune écriture de style ici. --- */
+    var tallest = 0;
+    var cardsTop = [];
+    for (i = 0; i < cards.length; i++) {
+      if (cards[i].offsetHeight > tallest) {
+        tallest = cards[i].offsetHeight;
       }
+      cardsTop.push(cards[i].getBoundingClientRect().top);
+    }
+    var joursTop = [];
+    for (i = 0; i < jours.length; i++) {
+      joursTop.push(jours[i].getBoundingClientRect().top);
+    }
+
+    /* --- Phase d'écriture. --- */
+    for (i = 0; i < cards.length; i++) {
+      // Hauteur de la plus grande carte, pour garder une grille régulière.
       cards[i].style.minHeight = tallest + 'px';
 
-      if (rect.top < window.innerHeight - 40) {
+      if (cardsTop[i] < vh - 40) {
         UIKit.cls(cards[i], 'visible', true);
         cards[i].style.transform = 'translateY(0px)';
       } else {
@@ -180,12 +207,23 @@
     }
 
     // Les cases du calendrier apparaissent progressivement à l'approche.
-    var jours = UIKit.qsa('.cal-day');
-    for (var k = 0; k < jours.length; k++) {
-      var box = jours[k].getBoundingClientRect();
-      var d = Math.abs(box.top - window.innerHeight / 2);
-      jours[k].style.opacity = Math.max(0.15, 1 - d / window.innerHeight);
+    for (i = 0; i < jours.length; i++) {
+      var d = Math.abs(joursTop[i] - vh / 2);
+      jours[i].style.opacity = Math.max(0.15, 1 - d / vh);
     }
+  }
+
+  /* Le scroll et le resize se déclenchent bien plus souvent que le
+     navigateur ne peint. On ne garde qu'un appel par image affichée :
+     même rendu, une fraction du travail. */
+  var revealPending = false;
+  function scheduleReveal() {
+    if (revealPending) return;
+    revealPending = true;
+    window.requestAnimationFrame(function () {
+      revealPending = false;
+      revealCards();
+    });
   }
 
   /* Affiche les images une fois chargées. */
@@ -210,7 +248,9 @@
     if (champ) champ.addEventListener('input', filterGallery);
   });
 
-  window.addEventListener('scroll', revealCards);
-  window.addEventListener('resize', revealCards);
+  // passive : le gestionnaire n'appelle jamais preventDefault(), le dire
+  // explicitement évite au navigateur d'attendre avant de faire défiler.
+  window.addEventListener('scroll', scheduleReveal, { passive: true });
+  window.addEventListener('resize', scheduleReveal);
   window.addEventListener('load', revealCards);
 })();
