@@ -1,3 +1,7 @@
 # Fichiers de travail — ne font pas partie du rendu
 .DS_Store
 Thumbs.db
+
+# Archive de rendu, regeneree a la demande
+nom-prenom.zip
+*.zip

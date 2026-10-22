@@ -50,14 +50,14 @@ c'est-à-dire **texte compressé en gzip** et images telles quelles :
 
 | | Brut | Servi (gzip) |
 |---|---|---|
-| `index.html` | 10 818 o | 3 882 o |
+| `index.html` | 11 098 o | 4 005 o |
 | `css/styles.css` | 6 546 o | 2 535 o |
 | `js/app.js` | 12 365 o | 4 945 o |
 | `js/analytics.js` | 3 357 o | 1 579 o |
 | `js/vendor/ui-kit.min.js` | 1 945 o | 1 062 o |
-| **Sous-total texte** | | **14 003 o** |
+| **Sous-total texte** | | **14 126 o** |
 | Images + polices (non compressibles) | | 1 759 535 o |
-| **Total** | | **1 773 538 o ≈ 1,73 Mo** |
+| **Total** | | **1 773 661 o ≈ 1,73 Mo** |
 
 ### Métriques de rendu
 
