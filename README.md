@@ -1,4 +1,23 @@
-# TP d'optimisation web — R3.14
+# TP d'optimisation web — R3.14 · version corrigée
+
+**Fork optimisé du sujet, rendu de Léa C.**
+
+- Site publié : <https://lyleah-24.github.io/R314-optimisation-site/>
+- Dépôt : <https://github.com/lyleah-24/R314-optimisation-site>
+- **Rapport avant/après : [`rapport-optimisation.md`](rapport-optimisation.md)**
+- Captures d'audit : [`audit/`](audit/)
+
+Poids total passé de **17,5 Mo à 1,73 Mo** (−90 %), 22 requêtes à 15, et pic de
+blocage du thread principal de **440 ms à 12 ms**. Le détail, les preuves et les
+limites de mesure sont dans le rapport. Un commit = une optimisation, voir
+`git log`.
+
+Le site d'origine, non optimisé, reste consultable pour comparaison :
+<https://nico3807.github.io/R314-optimisation-site/>
+
+---
+
+## Sujet d'origine
 
 Site support du TP d'optimisation et d'hébergement, BUT MMI Béziers.
 
