@@ -83,14 +83,18 @@
       <div class="container">
         <h2>Galerie</h2>
         <div class="grid">
+          <!-- img1 à img3 forment la première rangée de la grille en trois
+               colonnes : elles sont au-dessus de la ligne de flottaison sur un
+               écran large, elles restent donc en chargement normal. Le
+               chargement différé ne commence qu'à la seconde rangée. -->
           <div class="card" data-mots="paysage montagne aube brume grand angle">
             <a href="img1.html"><img src="img/img1.jpg" alt="Image 1" width="1600" height="903" fetchpriority="high" decoding="async" /></a>
           </div>
           <div class="card" data-mots="architecture ville façade contraste élevé">
-            <a href="img2.html"><img src="img/img2.jpg" alt="Image 2" width="1600" height="1200" loading="lazy" decoding="async" /></a>
+            <a href="img2.html"><img src="img/img2.jpg" alt="Image 2" width="1600" height="1200" decoding="async" /></a>
           </div>
           <div class="card" data-mots="portrait studio clair-obscur noir profond">
-            <a href="img3.html"><img src="img/img3.jpg" alt="Image 3" width="1600" height="1200" loading="lazy" decoding="async" /></a>
+            <a href="img3.html"><img src="img/img3.jpg" alt="Image 3" width="1600" height="1200" decoding="async" /></a>
           </div>
           <div class="card" data-mots="littoral falaise heure dorée pose longue">
             <a href="img4.html"><img src="img/img4.jpg" alt="Image 4" width="1600" height="1200" loading="lazy" decoding="async" /></a>
