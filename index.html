@@ -6,16 +6,28 @@
     <title>Site non optimisé...</title>
 
     <link rel="icon" type="image/png" href="img/favicon.png" />
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+
+    <!-- La police est auto-hébergée : son @font-face n'est découvert
+         qu'après l'analyse de la feuille de style. On la précharge pour
+         ne pas payer cet aller-retour en série. crossorigin est
+         obligatoire pour les polices, même en même origine. -->
     <link rel="preload" as="font" type="font/woff2"
-          href="https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLDz8Z1xlFQ.woff2" />
-    <link rel="preload" as="image" href="img/img6.jpg?v=2" />
+          href="fonts/poppins-400-latin.woff2" crossorigin />
+
+    <!-- Élément LCP : en une colonne (mobile), la première vignette de
+         la galerie est le plus gros élément peint. L'ancien préchargement
+         visait img6.jpg?v=2 — une image hors écran, et sous une URL
+         distincte de celle du <img>, donc téléchargée deux fois. -->
+    <link rel="preload" as="image" href="img/img1.jpg" fetchpriority="high" />
 
     <link rel="stylesheet" href="css/styles.css" />
 
-    <script src="js/legacy/polyfills.js"></script>
-    <script src="js/vendor/ui-kit.min.js"></script>
-    <script src="js/app.js"></script>
+    <!-- defer : ces scripts ne font rien avant que le DOM existe. En
+         bloquant, ils retardaient le premier rendu de toute leur durée
+         d'exécution. js/legacy/polyfills.js n'existe pas : la requête
+         partait quand même et coûtait un aller-retour pour un 404. -->
+    <script src="js/vendor/ui-kit.min.js" defer></script>
+    <script src="js/app.js" defer></script>
     <script src="js/analytics.js" defer></script>
 
     <!-- ===== Infrastructure du TP : hors exercice =====================
@@ -72,22 +84,22 @@
         <h2>Galerie</h2>
         <div class="grid">
           <div class="card" data-mots="paysage montagne aube brume grand angle">
-            <a href="img1.html"><img src="img/img1.jpg" alt="Image 1" /></a>
+            <a href="img1.html"><img src="img/img1.jpg" alt="Image 1" width="1600" height="903" fetchpriority="high" decoding="async" /></a>
           </div>
           <div class="card" data-mots="architecture ville façade contraste élevé">
-            <a href="img2.html"><img src="img/img2.jpg" alt="Image 2" /></a>
+            <a href="img2.html"><img src="img/img2.jpg" alt="Image 2" width="1600" height="1200" loading="lazy" decoding="async" /></a>
           </div>
           <div class="card" data-mots="portrait studio clair-obscur noir profond">
-            <a href="img3.html"><img src="img/img3.jpg" alt="Image 3" /></a>
+            <a href="img3.html"><img src="img/img3.jpg" alt="Image 3" width="1600" height="1200" loading="lazy" decoding="async" /></a>
           </div>
           <div class="card" data-mots="littoral falaise heure dorée pose longue">
-            <a href="img4.html"><img src="img/img4.jpg" alt="Image 4" /></a>
+            <a href="img4.html"><img src="img/img4.jpg" alt="Image 4" width="1600" height="1200" loading="lazy" decoding="async" /></a>
           </div>
           <div class="card" data-mots="photo de rue ruelle silhouette monochrome">
-            <a href="img5.html"><img src="img/img5.jpg" alt="Image 5" /></a>
+            <a href="img5.html"><img src="img/img5.jpg" alt="Image 5" width="1600" height="1200" loading="lazy" decoding="async" /></a>
           </div>
           <div class="card" data-mots="forêt sentier lumière rasante macro">
-            <a href="img6.html"><img src="img/img6.jpg" alt="Image 6" /></a>
+            <a href="img6.html"><img src="img/img6.jpg" alt="Image 6" width="1600" height="1200" loading="lazy" decoding="async" /></a>
           </div>
         </div>
         <div class="gallery-filter">
