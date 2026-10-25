@@ -7,10 +7,20 @@
 - **Rapport avant/après : [`rapport-optimisation.md`](rapport-optimisation.md)**
 - Captures d'audit : [`audit/`](audit/)
 
-Poids total passé de **17,5 Mo à 1,73 Mo** (−90 %), 22 requêtes à 15, et pic de
-blocage du thread principal de **440 ms à 12 ms**. Le détail, les preuves et les
-limites de mesure sont dans le rapport. Un commit = une optimisation, voir
-`git log`.
+| Indicateur | Avant | Après |
+|---|---|---|
+| Poids total transféré | 17,5 Mo | **1,73 Mo** (−90 %) |
+| Requêtes | 22 | **15** |
+| Score PageSpeed mobile | 61 | **79** |
+| Score PageSpeed ordinateur | 41 | **93** |
+| LCP mobile | 67,0 s | **4,8 s** |
+| TBT ordinateur | 540 ms | **10 ms** |
+| Pic de blocage du thread | 440 ms | **12 ms** |
+
+Rendu visuellement et fonctionnellement identique : hauteur de page identique au
+centième de pixel, styles calculés comparés sur 23 sélecteurs. Le détail, les
+preuves et les limites de mesure sont dans le rapport. Un commit = une
+optimisation, voir `git log`.
 
 Le site d'origine, non optimisé, reste consultable pour comparaison :
 <https://nico3807.github.io/R314-optimisation-site/>

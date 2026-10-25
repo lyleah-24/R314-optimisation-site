@@ -7,7 +7,14 @@
 | Dépôt (fork) | <https://github.com/lyleah-24/R314-optimisation-site> |
 | Site publié | <https://lyleah-24.github.io/R314-optimisation-site/> |
 | Site de référence (avant) | <https://nico3807.github.io/R314-optimisation-site/> |
-| Date des relevés « avant » | 22 octobre 2026, 10 h 40 UTC+2 |
+| Relevés « avant » | 22 octobre 2026, 10 h 40 UTC+2 |
+| Relevés « après » | 25 octobre 2026, 14 h 46 UTC+1 |
+
+**En un coup d'œil :** poids total **17,5 Mo → 1,73 Mo** (−90 %), requêtes
+**22 → 15**, score PageSpeed **61 → 79** en mobile et **41 → 93** en ordinateur,
+LCP mobile **67,0 s → 4,8 s**, TBT ordinateur **540 ms → 10 ms**. Rendu
+visuellement et fonctionnellement identique, vérifié par comparaison des styles
+calculés (partie 6).
 
 ---
 
@@ -78,28 +85,65 @@ bien la version corrigée qui est en ligne :
 
 ### Métriques de rendu
 
-| Métrique | Avant mobile | Après mobile | Avant ordinateur | Après ordinateur |
-|---|---|---|---|---|
-| Score performance | 61 | | 41 | |
-| FCP | 2,4 s | | 1,0 s | |
-| LCP | **67,0 s** | | **12,0 s** | |
-| CLS | 0 | | 0,021 | |
-| TBT | 130 ms | | 540 ms | |
-| Speed Index | 18,0 s | | 4,9 s | |
+Relevés PageSpeed Insights sur les deux URL publiques. « Avant » : site de
+référence, 22 octobre 2026, 10 h 40 UTC+2. « Après » : site corrigé déployé,
+**25 octobre 2026, 14 h 46 UTC+1**.
 
-> ⚠️ **Les colonnes « après » sont à compléter à la main**, après relevé sur
-> <https://pagespeed.web.dev/analysis?url=https%3A%2F%2Flyleah-24.github.io%2FR314-optimisation-site%2F>.
-> Protocole à respecter pour que la comparaison tienne : **trois lancements par
-> profil, valeur médiane retenue**, fenêtre de navigation privée. Les temps de
-> ce site sont très instables (voir partie 1), un relevé unique ne veut rien
-> dire. Les captures vont dans `audit/`, en précisant bien le profil de
-> chacune — une capture Lighthouse sans mention mobile/ordinateur ne prouve
-> rien.
->
-> **Attention au piège classique :** vérifiez que l'URL analysée est bien
-> `lyleah-24.github.io` et non `nico3807.github.io`. Relancer le lien
-> pré-rempli du sujet remesure le site de référence et donne l'impression que
-> rien n'a changé.
+#### Profil Mobile — *Moto G Power, connexion 4G lente, Lighthouse 13.5.0*
+
+| Métrique | Avant | Après | Gain |
+|---|---|---|---|
+| **Score performance** | 🟠 61 | 🟠 **79** | **+18 points** |
+| FCP | 🟠 2,4 s | 🟢 **0,9 s** | −63 % |
+| LCP | 🔴 **67,0 s** | 🔴 **4,8 s** | **−93 %** |
+| CLS | 🟢 0 | 🟢 0 | stable |
+| TBT | 🟢 130 ms | 🟢 **0 ms** | **−100 %** |
+| Speed Index | 🔴 18,0 s | 🟠 **4,7 s** | −74 % |
+
+*Captures : `audit/Analyse mobile 1-2.png` (avant), `audit/Analyse améliorée
+mobile 1-2.png` (après).*
+
+#### Profil Ordinateur — *émulation ordinateur, limitation personnalisée*
+
+| Métrique | Avant | Après | Gain |
+|---|---|---|---|
+| **Score performance** | 🔴 41 | 🟢 **93** | **+52 points** |
+| FCP | 🟢 1,0 s | 🟢 **0,3 s** | −70 % |
+| LCP | 🔴 **12,0 s** | 🟠 **1,7 s** | **−86 %** |
+| CLS | 🟢 0,021 | 🟢 **0** | −100 % |
+| TBT | 🔴 **540 ms** | 🟢 **10 ms** | **−98 %** |
+| Speed Index | 🔴 4,9 s | 🟢 **0,7 s** | −86 % |
+
+*Captures : `audit/Analyse desktop 1-2.png` (avant), `audit/Analyse améliorée
+bureau 1-2.png` (après).*
+
+#### Effet de bord sur les autres catégories
+
+| Catégorie | Avant | Après |
+|---|---|---|
+| Bonnes pratiques | 96 | **100** |
+| Accessibilité | 91 | 91 |
+| SEO | 91 | 91 |
+
+Les Bonnes pratiques passent à 100 sur les deux profils. Ce n'était pas
+l'objectif — la catégorie est hors périmètre du TP — mais c'est cohérent : la
+requête vers `js/legacy/polyfills.js` produisait une erreur réseau consignée
+dans la console, ce que Lighthouse pénalise dans cette catégorie. Supprimer le
+404 a réglé les deux d'un coup. Accessibilité et SEO sont inchangées, ce qui
+est attendu : aucune de nos corrections ne touche à la structure du contenu ni
+au balisage sémantique.
+
+> **Réserve méthodologique.** Ces relevés « après » sont **un lancement par
+> profil** (horodatage identique, 14 h 46, pour les deux onglets d'une même
+> analyse), pas la médiane de trois. Pour le **LCP**, le **CLS** et le **poids**,
+> c'est suffisant : la partie 1 établit que ces valeurs sont stables sur ce
+> site, et l'ordre de grandeur du gain (−93 %, −86 %) dépasse de très loin la
+> variance observée. Pour le **TBT**, métrique la plus instable des six, un
+> relevé unique prouverait peu à lui seul — mais il est corroboré par deux
+> éléments indépendants : la mesure directe du blocage ci-dessous (pic de
+> 440 ms → 12 ms), et le fait que la cause du TBT, un `setInterval` et deux
+> boucles d'attente, a été **supprimée par construction** et non simplement
+> atténuée. Il n'y a plus de code susceptible de bloquer le thread.
 
 ### Mesure directe du blocage du thread principal
 
@@ -467,6 +511,33 @@ signalait un problème **de processeur qui ne se manifeste pas en mobile** — e
 c'était exactement la condition `innerWidth > 1024` de `analytics.js`. Le
 chiffre aberrant n'était pas un défaut de l'outil, c'était la piste.
 
+**Et les relevés « après » le confirment.** C'est la vérification la plus
+satisfaisante de cet audit :
+
+| | Mobile | Ordinateur | Relation |
+|---|---|---|---|
+| Avant | 61 | 41 | **inversée** (ordinateur moins bien noté) |
+| Après | 79 | 93 | **normale** (ordinateur mieux noté) |
+
+L'ordinateur passe de 20 points **en dessous** du mobile à 14 points
+**au-dessus**. C'est exactement ce qu'on attend d'un site sain, puisque le
+profil mobile simule un matériel et un réseau nettement plus lents. Le +52 du
+profil Ordinateur contre le +18 du mobile n'est pas un hasard non plus : le
+gros du gain sur ordinateur vient de la suppression d'un problème **qui ne
+s'exprimait que là**. Si notre diagnostic sur `analytics.js` avait été faux,
+les deux profils auraient progressé dans les mêmes proportions. Le fait que
+l'anomalie de départ ait disparu, et pas seulement les mauvais chiffres, est ce
+qui distingue une correction de cause d'une correction de symptôme.
+
+**Le LCP mobile reste la seule métrique en rouge** (4,8 s), et nous savons
+pourquoi : à 1,7 Mo, les images restent le poste dominant. C'est précisément la
+marge identifiée en partie 7 — formats AVIF/WebP et `srcset`, qui ramèneraient
+ce poste à 600-800 Ko. Nous ne l'avons pas appliquée faute d'encodeur
+disponible et parce que la consigne interdit les outils de build, mais le
+chiffre confirme que c'est bien là, et nulle part ailleurs, que se trouve le
+prochain gain. Sur ordinateur, où la bande passante simulée est plus large, le
+même poids ne suffit plus à dégrader le LCP : 1,7 s, en orange.
+
 ---
 
 ## 9. Historique des corrections
@@ -495,16 +566,31 @@ Un commit par optimisation, sur <https://github.com/lyleah-24/R314-optimisation-
       requêtes**. C'est ce relevé qui confirme le tableau de la partie 2 : il
       porte sur les fichiers tels que l'hébergeur les compresse, pas sur une
       estimation locale.
-- [ ] Relever PageSpeed Insights sur l'URL publiée, **mobile et ordinateur**,
-      trois lancements chacun, médiane retenue → compléter les deux colonnes
-      « après » de la partie 2 et déposer les captures dans `audit/`.
-- [ ] Refaire la mesure de blocage dans le panneau Performances des DevTools
-      (ralentissement CPU ×4, 20 s avec défilement) pour disposer d'une capture
-      de la frise « après » comparable à `audit/Profil desktop.png`. Vérifier
-      au passage que la console ne signale plus de *Forced reflow*, et que
-      `window.__au` affiche bien `n: 1` au lieu de monter à 24.
+- [x] **Relever PageSpeed Insights sur l'URL publiée, mobile et ordinateur.**
+      Fait le 25 octobre 2026 à 14 h 46 : mobile 61 → **79**, ordinateur
+      41 → **93**. Tableaux complétés en partie 2, captures dans `audit/`
+      (`Analyse améliorée mobile 1-2.png`, `Analyse améliorée bureau 1-2.png`).
+      Réserve notée : un lancement par profil et non la médiane de trois — la
+      portée de cette limite est discutée en partie 2.
+
+### Ce qui reste optionnel
+
+Le rendu est complet en l'état : audit initial, problèmes identifiés,
+corrections appliquées et mesurées, rapport avant/après chiffré. Les trois
+points ci-dessous n'ajouteraient que de la redondance de preuve.
+
+- [ ] Capture de la frise du panneau Performances « après » (CPU ×4, 20 s avec
+      défilement), en pendant de `audit/Profil desktop.png`. Deux contrôles
+      rapides à faire au passage, et qui se photographient bien : la console ne
+      doit plus afficher de *Forced reflow*, et `window.__au` doit rester à
+      `n: 1` au lieu de monter à 24.
 - [ ] Capture de l'onglet Réseau « après », trié par taille, barre de total
-      visible. Le total attendu est d'environ 1,7 Mo sur 12 requêtes au
-      chargement initial (15 une fois la page défilée jusqu'en bas, les
-      vignettes img4 à img6 étant en chargement différé).
-- [ ] Renommer `nom-prenom.zip` et le régénérer si le rapport a changé depuis.
+      visible : ~1,7 Mo sur 12 requêtes au chargement initial, 15 une fois la
+      page défilée jusqu'en bas (img4 à img6 étant en chargement différé).
+- [ ] Deux lancements PageSpeed supplémentaires par profil pour disposer d'une
+      médiane sur le TBT.
+
+### Avant dépôt sur Moodle
+
+- [ ] Renommer `nom-prenom.zip` avec vos nom et prénom, et le régénérer si le
+      rapport a changé depuis sa dernière génération.
