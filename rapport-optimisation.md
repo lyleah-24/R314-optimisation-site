@@ -45,36 +45,61 @@ ordres de grandeur.
 | **Poids total transféré** | 17,5 Mo | **1,73 Mo** | **−90 %** |
 | **Requêtes** | 22 | **15** (12 au chargement initial) | **−32 %** |
 
-Le poids « après » est calculé sur les fichiers tels que GitHub Pages les sert,
-c'est-à-dire **texte compressé en gzip** et images telles quelles :
+Le poids « après » n'est pas une estimation locale : il a été **relevé sur le
+site déployé**, en demandant chaque ressource à GitHub Pages avec
+`Accept-Encoding: gzip, br` et en mesurant les octets réellement reçus. C'est
+la seule mesure qui vaille, puisqu'un serveur local ne compresse pas le texte.
 
-| | Brut | Servi (gzip) |
+| Ressource | Sur le disque | Servi par GitHub Pages |
 |---|---|---|
-| `index.html` | 11 098 o | 4 005 o |
-| `css/styles.css` | 6 546 o | 2 535 o |
-| `js/app.js` | 12 365 o | 4 945 o |
-| `js/analytics.js` | 3 357 o | 1 579 o |
-| `js/vendor/ui-kit.min.js` | 1 945 o | 1 062 o |
-| **Sous-total texte** | | **14 126 o** |
-| Images + polices (non compressibles) | | 1 759 535 o |
-| **Total** | | **1 773 661 o ≈ 1,73 Mo** |
+| `index.html` | 11 098 o | 4 007 o |
+| `css/styles.css` | 6 546 o | 2 528 o |
+| `js/app.js` | 12 365 o | 4 956 o |
+| `js/analytics.js` | 3 357 o | 1 565 o |
+| `js/vendor/ui-kit.min.js` | 1 945 o | 1 049 o |
+| **Sous-total texte** | 35 311 o | **14 105 o** (−60 %) |
+| `fonts/` (2 graisses woff2) | 15 884 o | 15 884 o |
+| `img/` (favicon + 7 visuels) | 1 743 651 o | 1 743 651 o |
+| **Total** | | **1 773 640 o ≈ 1,73 Mo** |
+
+Les images et les polices sont déjà compressées : gzip n'y change rien, leur
+poids est le même partout. Tout l'écart entre poids sur disque et poids servi
+vient donc des cinq fichiers texte.
+
+Vérifications complémentaires sur le site déployé, qui confirment que c'est
+bien la version corrigée qui est en ligne :
+
+| Contrôle | Résultat |
+|---|---|
+| `img/img1.jpg` | 93 544 o (contre 2 523 899 o avant) |
+| `css/extra.css`, `css/theme-legacy.css` | HTTP 404 — supprimés, et plus demandés |
+| `js/legacy/polyfills.js` | HTTP 404 — mais plus aucune balise ne le demande |
+| `cdn.jsdelivr.net`, `fonts.gstatic.com` | absents du HTML |
 
 ### Métriques de rendu
 
-| Métrique | Avant mobile | Avant ordinateur | Après |
-|---|---|---|---|
-| Score performance | 61 | 41 | *à relever après déploiement* |
-| FCP | 2,4 s | 1,0 s | *idem* |
-| LCP | **67,0 s** | **12,0 s** | *idem* |
-| CLS | 0 | 0,021 | *idem* |
-| TBT | 130 ms | 540 ms | *idem* |
-| Speed Index | 18,0 s | 4,9 s | *idem* |
+| Métrique | Avant mobile | Après mobile | Avant ordinateur | Après ordinateur |
+|---|---|---|---|---|
+| Score performance | 61 | | 41 | |
+| FCP | 2,4 s | | 1,0 s | |
+| LCP | **67,0 s** | | **12,0 s** | |
+| CLS | 0 | | 0,021 | |
+| TBT | 130 ms | | 540 ms | |
+| Speed Index | 18,0 s | | 4,9 s | |
 
-> ⚠️ **Ces cases sont volontairement vides.** PageSpeed Insights n'analyse que
-> des URL publiques : tant que les corrections ne sont pas poussées sur le
-> fork, l'outil mesure encore l'ancienne version. Les relevés « après » se font
-> sur <https://lyleah-24.github.io/R314-optimisation-site/>, trois lancements,
-> valeur médiane, un par profil. Les captures iront dans `audit/`.
+> ⚠️ **Les colonnes « après » sont à compléter à la main**, après relevé sur
+> <https://pagespeed.web.dev/analysis?url=https%3A%2F%2Flyleah-24.github.io%2FR314-optimisation-site%2F>.
+> Protocole à respecter pour que la comparaison tienne : **trois lancements par
+> profil, valeur médiane retenue**, fenêtre de navigation privée. Les temps de
+> ce site sont très instables (voir partie 1), un relevé unique ne veut rien
+> dire. Les captures vont dans `audit/`, en précisant bien le profil de
+> chacune — une capture Lighthouse sans mention mobile/ordinateur ne prouve
+> rien.
+>
+> **Attention au piège classique :** vérifiez que l'URL analysée est bien
+> `lyleah-24.github.io` et non `nico3807.github.io`. Relancer le lien
+> pré-rempli du sujet remesure le site de référence et donne l'impression que
+> rien n'a changé.
 
 ### Mesure directe du blocage du thread principal
 
@@ -462,12 +487,24 @@ Un commit par optimisation, sur <https://github.com/lyleah-24/R314-optimisation-
 
 ## 10. Reste à faire
 
-- [ ] Pousser le fork et vérifier la publication GitHub Pages.
+- [x] **Pousser le fork et vérifier la publication GitHub Pages.** Fait :
+      commits `5f729eb..33f9fd4` poussés, et le site servi a été contrôlé —
+      `img/img1.jpg` renvoie bien 93 544 o (contre 2 523 899 o avant),
+      `css/extra.css` et `css/theme-legacy.css` renvoient 404, et le poids
+      total réellement servi par GitHub Pages est de **1 773 640 o sur 15
+      requêtes**. C'est ce relevé qui confirme le tableau de la partie 2 : il
+      porte sur les fichiers tels que l'hébergeur les compresse, pas sur une
+      estimation locale.
 - [ ] Relever PageSpeed Insights sur l'URL publiée, **mobile et ordinateur**,
-      trois lancements chacun, médiane retenue → compléter le tableau de la
-      partie 2 et déposer les captures dans `audit/`.
+      trois lancements chacun, médiane retenue → compléter les deux colonnes
+      « après » de la partie 2 et déposer les captures dans `audit/`.
 - [ ] Refaire la mesure de blocage dans le panneau Performances des DevTools
       (ralentissement CPU ×4, 20 s avec défilement) pour disposer d'une capture
-      de la frise « après » comparable à `audit/Profil desktop.png`.
+      de la frise « après » comparable à `audit/Profil desktop.png`. Vérifier
+      au passage que la console ne signale plus de *Forced reflow*, et que
+      `window.__au` affiche bien `n: 1` au lieu de monter à 24.
 - [ ] Capture de l'onglet Réseau « après », trié par taille, barre de total
-      visible.
+      visible. Le total attendu est d'environ 1,7 Mo sur 12 requêtes au
+      chargement initial (15 une fois la page défilée jusqu'en bas, les
+      vignettes img4 à img6 étant en chargement différé).
+- [ ] Renommer `nom-prenom.zip` et le régénérer si le rapport a changé depuis.
